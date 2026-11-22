@@ -1,0 +1,261 @@
+;; ============================================================================
+;; Kanata config for 8BitDo Retro Mechanical Keyboard (ANSI TKL)
+;; Ported from: config/corneish_zen.keymap (ZMK)
+;; Supports: macOS & Windows (Kanata v1.9+ / tested against v1.12.0)
+;;
+;; Emergency exit if anything ever gets stuck:
+;;   LCtrl + Space + Esc
+;; ============================================================================
+
+(defcfg
+  ;; Process keys outside defsrc so tap-hold, one-shot, fork, and chords work cleanly
+  process-unmapped-keys yes
+  ;; Required for defchordsv2 + tap-hold to coexist smoothly
+  concurrent-tap-hold yes
+
+  ;; --------------------------------------------------------------------------
+  ;; macOS: Only intercept the 8BitDo keyboard so your Corneish Zen (ZMK) and
+  ;; built-in MacBook keyboard are untouched.
+  ;; Run `sudo kanata --list` to check the exact name reported by your 8BitDo
+  ;; (USB / 2.4G / Bluetooth may appear under slightly different names) and
+  ;; uncomment the block below with your exact device name(s):
+  ;; --------------------------------------------------------------------------
+  ;; macos-dev-names-include (
+  ;;   "8BitDo Retro Mechanical Keyboard"
+  ;;   "8BitDo Retro Keyboard"
+  ;; )
+)
+
+;; Only the main typing block + bottom row + ScrollLock (passthrough toggle).
+;; All other TKL keys (Esc, F-row, number row, arrows, Ins/Home/PgUp, etc.)
+;; remain normal and work natively thanks to `process-unmapped-keys yes`.
+(defsrc
+  tab  q    w    e    r    t    y    u    i    o    p    bspc
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc            ralt rctl      slck
+)
+
+(defvar
+  ;; Mirror ZMK timings from corneish_zen.keymap:
+  ;;   lht: tapping-term-ms=180, quick-tap-ms=80,  balanced
+  ;;   rht: tapping-term-ms=200, quick-tap-ms=100, balanced
+  ;;   n_lt: tapping-term-ms=150, quick-tap-ms=90, tap-preferred
+  lht-tap   80
+  lht-hold  180
+  rht-tap   100
+  rht-hold  200
+  nlt-tap   90
+  nlt-hold  150
+
+  ;; Combo window (ms)
+  chord-time 50
+
+  ;; Keys that force EARLY TAP for left-hand HRMs (`A` / `S`).
+  ;; Matches ZMK `lht` hold-trigger-key-positions (all right hand + W, A, S, C, V
+  ;; are allowed to trigger hold; remaining left-hand keys force tap).
+  lht-tap-keys (
+    tab q e r t
+    caps d f g
+    lsft z x b
+  )
+
+  ;; Keys that force EARLY TAP for right-hand HRM (`K`).
+  ;; Matches ZMK `rht` hold-trigger-key-positions (all left hand triggers hold;
+  ;; same-hand right keys force tap).
+  rht-tap-keys (
+    y u i o p bspc
+    h j l ; ' ret
+    n m , . / rsft
+  )
+
+  ;; Keys that force EARLY TAP for `F` -> NUMPAD (`n_lt`).
+  ;; Right-hand numpad area + Space stay excluded so F + numpad keys work cleanly.
+  nlt-tap-keys (
+    tab q w e r t
+    caps a s d g
+    lsft z x c v b
+  )
+)
+
+(defalias
+  ;; --- Home Row Mods & F-hold Numpad (bilateral + require-prior-idle) ---
+  a_ctl (tap-hold-release-keys $lht-tap $lht-hold a lctl $lht-tap-keys (require-prior-idle 80))
+  s_sft (tap-hold-release-keys $lht-tap $lht-hold s lsft $lht-tap-keys (require-prior-idle 80))
+  f_num (tap-hold-tap-keys     $nlt-tap $nlt-hold f (layer-while-held numpad) $nlt-tap-keys (require-prior-idle 90))
+  k_ctl (tap-hold-release-keys $rht-tap $rht-hold k lctl $rht-tap-keys (require-prior-idle 100))
+
+  ;; --- Layer triggers (User layout: LAlt = SYMBOL, RAlt = NAV) ---
+  sym   (layer-while-held symbol)
+  nav   (layer-while-held nav)
+  fnc   (layer-while-held func)
+  ret_p (tap-hold-release 150 200 ret (layer-while-held pscr))
+
+  ;; Layer switches (matching ZMK &to NUMPAD / &to NAV / &to DEFAULT)
+  to_def (layer-switch default)
+  to_nav (layer-switch nav)
+  to_num (layer-switch numpad)
+  to_raw (layer-switch passthrough)
+
+  ;; --- Backspace / Shift+Backspace -> Delete (matching ZMK bspc_del) ---
+  bspc_d (fork bspc (unshift del) (lsft rsft))
+
+  ;; --- Sticky Shift on Right Shift tap; normal Shift on hold ---
+  sk_sft (one-shot-release 600 lsft)
+  rsft_s (tap-hold-release 150 180 @sk_sft rsft)
+
+  ;; --- Sticky mods for NUMPAD layer (matching ZMK &sk 600ms) ---
+  sk_gui (one-shot-release 600 lmet)
+  sk_ctl (one-shot-release 600 lctl)
+  sk_alt (one-shot-release 600 lalt)
+
+  ;; --- Caps tap-dance: 1 tap = LShift, 2 taps = prog_caps_word, 3 taps = CapsLock ---
+  ;; prog_caps_word shifts a-z and continues on `_` (S--), `-`, 0-9, bspc, del.
+  cw     (caps-word-custom 2000
+           (a b c d e f g h i j k l m n o p q r s t u v w x y z)
+           (0 1 2 3 4 5 6 7 8 9 - bspc del lsft rsft))
+  td_cap (tap-dance 150 (lsft @cw caps))
+
+  ;; --- Shifted symbol helpers (US QWERTY) ---
+  tilde  S-grv   ;; ~
+  excl   S-1     ;; !
+  at     S-2     ;; @
+  hash   S-3     ;; #
+  dllr   S-4     ;; $
+  prcnt  S-5     ;; %
+  caret  S-6     ;; ^
+  amps   S-7     ;; &
+  star   S-8     ;; *
+  lpar   S-9     ;; (
+  rpar   S-0     ;; )
+  lbrc   S-[     ;; {
+  rbrc   S-]     ;; }
+  pipe   S-\     ;; |
+  under  S--     ;; _
+  plus   S-=     ;; +
+  colon  S-;     ;; :
+  dqt    S-'     ;; "
+  lt     S-,     ;; <
+  gt     S-.     ;; >
+  qmark  S-/     ;; ?
+
+  ;; --- Shortcut helpers ---
+  atab   A-tab   ;; Alt+Tab (approximates ZMK swapper on SYMBOL + Caps)
+  g_spc  M-spc   ;; GUI + Space (Spotlight / launcher)
+  c_spc  C-spc   ;; Ctrl + Space
+  c_crt  C-S-6   ;; Ctrl + ^ (Vim alternate file)
+  a1     A-1
+  a2     A-2
+  a3     A-3
+  a4     A-4
+  a5     A-5
+  s_prt  S-prtsc ;; Shift + PrintScreen
+  ;; --- Layer-aware M + , combo: M-l on SYMBOL, Esc on DEFAULT ---
+  m_cma (switch
+    ((layer symbol)) M-l break
+    ()               esc break
+  )
+)
+
+;; ============================================================================
+;; Combos (ported from ZMK lines 102-105)
+;;   M + ,     -> ESC        (DEFAULT layer) / GUI + L (SYMBOL layer)
+;;   C + V     -> TAB        (all active layers)
+;;   A + S + V -> Ctrl+Shift+V (all active layers)
+;; ============================================================================
+(defchordsv2
+  (m ,)   @m_cma $chord-time first-release (func nav numpad pscr passthrough)
+  (c v)   tab    $chord-time first-release (passthrough)
+  (a s v) C-S-v  $chord-time first-release (passthrough)
+)
+
+;; ============================================================================
+;; Layer 0: DEFAULT (QWERTY + HRMs + F-Numpad)
+;; Note: RCtrl is mapped to LAlt so you still have a physical Alt/Option key
+;;       since LAlt = SYMBOL and RAlt = NAV.
+;;       ScrollLock toggles Passthrough mode (handy on Windows for gaming or
+;;       when switching back to your Corneish Zen).
+;; ============================================================================
+(deflayer default
+  tab     q      w      e      r      t      y      u      i      o      p      @bspc_d
+  @td_cap @a_ctl @s_sft d      @f_num g      h      j      @k_ctl l      ;      '       @ret_p
+  lsft    z      x      c      v      b      n      m      ,      .      /      @rsft_s
+  lctl    lmet   @sym                 spc                  @nav   lalt          @to_raw
+)
+
+;; ============================================================================
+;; Layer 1: SYMBOL (Hold Left Alt)
+;;   ~  !  @  #  $  %  |  ^  &  *  (  )  BKSP
+;; A-Tb [  ]  {  } M-␣ | C-^ -  =  _  :  "    RET
+;;   _  |  `  \  ~ C-␣ | XX  +  <  >  ?  FUNC
+;;   _ NUM _          0           NAV _  _
+;; ============================================================================
+(deflayer symbol
+  @tilde @excl  @at    @hash  @dllr  @prcnt @caret @amps  @star  @lpar  @rpar  _
+  @atab  [      ]      @lbrc  @rbrc  @g_spc @c_crt -      =      @under @colon @dqt  _
+  _      @pipe  grv    \      @tilde @c_spc XX     @plus  @lt    @gt    @qmark @fnc
+  _      @to_num _                   0                    @to_nav _            _
+)
+
+;; ============================================================================
+;; Layer 2: FUNC (SYMBOL + Right Shift)
+;;   F1 F2 F3 F4 F5 F6 | F7 F8 F9 F10 F11 F12
+;;   + R = live reload config (`lrld`), G = toggle passthrough (`@to_raw`)
+;; ============================================================================
+(deflayer func
+  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  _    _    _    _    lrld @to_raw _ _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _              _              _    _         _
+)
+
+;; ============================================================================
+;; Layer 3: NAV (Hold Right Alt, or locked via SYMBOL + Right Alt)
+;;   _  A-1 A-2 A-3 A-4 A-5 | HOME PGUP END  XX  XX  XX
+;;   _  CTL SFT PGD CTL XX  | LEFT DOWN UP  RGHT XX  XX  _
+;;  XX  XX  XX  MUT VL- VL+ | XX   XX   XX   XX  XX  XX  _
+;;   _   _   _              _                DEF  _  _
+;; ============================================================================
+(deflayer nav
+  _    @a1  @a2  @a3  @a4  @a5  home pgup end  XX   XX   XX
+  _    lctl lsft pgdn lctl XX   left down up   rght XX   XX   _
+  XX   XX   XX   mute vold volu XX   XX   XX   XX   XX   _
+  _    _    _              _              @to_def _      _
+)
+
+;; ============================================================================
+;; Layer 4: NUMPAD (Hold F, or locked via SYMBOL + Left Win/Cmd)
+;;    _    _    _    _   _   _ | DEF  7   8   9   +   _
+;;  sGUI sCTL sSFT sALT  _   _ |  _   4   5   6   -   *  KP_ENT
+;;   SFT  GUI  _    _    _   _ |  _   1   2   3   /   =
+;;    _    _   _               0              .  KP_ENT _
+;; ============================================================================
+(deflayer numpad
+  _       _       _       _       _    _    @to_def 7    8    9    @plus  _
+  @sk_gui @sk_ctl @sk_sft @sk_alt _    _    _       4    5    6    -      @star  kprt
+  lsft    lmet    _       _       _    _    _       1    2    3    /      =
+  _       _       _                    0                 .    kprt        _
+)
+
+;; ============================================================================
+;; Layer 5: PSCR (Hold Enter)
+;;   Hold Enter + Backspace -> Shift+PrtSc, Hold Enter + ' -> PrtSc
+;; ============================================================================
+(deflayer pscr
+  XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   @s_prt
+  XX   lctl lsft XX   XX   XX   XX   XX   XX   XX   XX   prtsc _
+  lalt XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   _
+  _    _    _              _              _    _         _
+)
+
+;; ============================================================================
+;; Layer 6: PASSTHROUGH (Raw keyboard — zero HRMs, zero combos, zero layers)
+;; Press ScrollLock (`slck`) again to return to DEFAULT layer.
+;; Ideal on Windows when switching back to Corneish Zen or playing games.
+;; ============================================================================
+(deflayer passthrough
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _              _              _    _         @to_def
+)
