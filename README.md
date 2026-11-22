@@ -30,7 +30,7 @@ cd kanata-config-8bitdo
 | **PSCR 截图层** | 按住 `Enter` | + `Backspace` = `Shift+PrtSc`，+ `'` = `PrtSc` |
 | **Sticky Shift** | 轻按 **`右 Shift`**（按住仍为普通 Shift） | 600ms 单次 Shift，对齐 ZMK `&sk LSHIFT` |
 | **Shift + Backspace** | `Shift + Backspace` | 输出 `Delete`（对齐 ZMK `bspc_del`） |
-| **Combos** | `M+,` = `Esc`（SYMBOL 层为 `Win/Cmd+L`）<br>`C+V` = `Tab`、`A+S+V` = `Ctrl+Shift+V` | 50ms 触发窗口 |
+| **Combos** | `M+,` = `Esc`（SYMBOL 层为 `Win/Cmd+L`）<br>`A+S+V` = `Ctrl+Shift+V` | 50ms 触发窗口 |
 | **纯透传模式（重要）** | **`ScrollLock`** 键 | 一键关闭所有改键/HRM/Combo；Windows 下切回 Zen Corne 或打游戏时按一下，再按一次恢复 |
 | **紧急退出 Kanata** | **`LCtrl + Space + Esc`** | Kanata 内置保底快捷键，随时强行退出 |
 

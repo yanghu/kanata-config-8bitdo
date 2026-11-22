@@ -157,12 +157,10 @@
 ;; ============================================================================
 ;; Combos (ported from ZMK lines 102-105)
 ;;   M + ,     -> ESC          (DEFAULT layer) / GUI + L (SYMBOL layer)
-;;   C + V     -> TAB          (all active layers)
 ;;   A + S + V -> Ctrl+Shift+V (all active layers)
 ;; ============================================================================
 (defchordsv2
   (m ,)   @m_cma $chord-time first-release (func numpad pscr passthrough)
-  (c v)   tab    $chord-time first-release (passthrough)
   (a s v) C-S-v  $chord-time first-release (passthrough)
 )
 
