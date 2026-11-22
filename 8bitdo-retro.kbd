@@ -100,9 +100,8 @@
   fnc   (layer-while-held func)
   ret_p (tap-hold-release 150 200 ret (layer-while-held pscr))
 
-  ;; Layer switches
+  ;; Passthrough toggle (dedicated ScrollLock key only — all typing layers are momentary)
   to_def (layer-switch default)
-  to_num (layer-switch numpad)
   to_raw (layer-switch passthrough)
 
   ;; --- Backspace / Shift+Backspace -> Delete (matching ZMK bspc_del) ---
@@ -184,44 +183,44 @@
 )
 
 ;; ============================================================================
-;; Layer 1: SYMBOL (Hold Left Alt)
+;; Layer 1: SYMBOL (Hold Left Alt — momentary only)
 ;;   grv -> ~
 ;;   A-Tb !  @  #  $  %  |  ^  &  *  (  )  BKSP
 ;;   CTL  [  ]  {  } M-␣ | C-^ -  =  _  :  "    RET
 ;;   _    |  `  \  ~ C-␣ | XX  +  <  >  ?  FUNC
-;;   _  NUM  _           0           _  _  _
+;;   _    _  _           0           _  _  _
 ;; ============================================================================
 (deflayer symbol
   @tilde
   @atab  @excl  @at    @hash  @dllr  @prcnt @caret @amps  @star  @lpar  @rpar  _
   _      [      ]      @lbrc  @rbrc  @g_spc @c_crt -      =      @under @colon @dqt  _
   _      @pipe  grv    \      @tilde @c_spc XX     @plus  @lt    @gt    @qmark @fnc
-  _      @to_num _                   0                    _      _             _
+  _      _      _                    0                    _      _             _
 )
 
 ;; ============================================================================
-;; Layer 2: FUNC (SYMBOL + Right Shift)
+;; Layer 2: FUNC (SYMBOL + Right Shift — momentary only)
 ;;   F1 F2 F3 F4 F5 F6 | F7 F8 F9 F10 F11 F12
-;;   + R = live reload config (`lrld`), G = toggle passthrough (`@to_raw`)
+;;   + R = live reload config (`lrld`)
 ;; ============================================================================
 (deflayer func
   _
   f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
-  _    _    _    _    lrld @to_raw _ _    _    _    _    _    _
+  _    _    _    _    lrld _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _              _              _    _         _
 )
 
 ;; ============================================================================
-;; Layer 3: NUMPAD (Hold F, or locked via SYMBOL + Left Win/Cmd)
-;;    _    _    _    _   _   _ | DEF  7   8   9   +   _
+;; Layer 3: NUMPAD (Hold F — momentary only)
+;;    _    _    _    _   _   _ |  _   7   8   9   +   _
 ;;  sGUI sCTL sSFT sALT  _   _ |  _   4   5   6   -   *  KP_ENT
 ;;   SFT  GUI  _    _    _   _ |  _   1   2   3   /   =
 ;;    _    _   _               0              .  KP_ENT _
 ;; ============================================================================
 (deflayer numpad
   _
-  _       _       _       _       _    _    @to_def 7    8    9    @plus  _
+  _       _       _       _       _    _    _       7    8    9    @plus  _
   @sk_gui @sk_ctl @sk_sft @sk_alt _    _    _       4    5    6    -      @star  kprt
   lsft    lmet    _       _       _    _    _       1    2    3    /      =
   _       _       _                    0                 .    kprt        _
