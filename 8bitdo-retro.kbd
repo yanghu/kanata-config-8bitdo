@@ -162,7 +162,7 @@
 ;;       Stick Up/Down  -> Win+Tab (Task View) / Win+D (Show Desktop)
 ;;       Stick L/R      -> Ctrl+Win+Left / Ctrl+Win+Right (Virtual Desktops)
 ;;   - macOS / Linux: pass raw F13-F18 straight through to Hammerspoon
-;;       (see hammerspoon/8bitdo_super.lua for app-aware voice + Google Meet)
+;;       (see https://github.com/yanghu/button-adapter -> hammerspoon/button_adapter.lua)
 ;; ============================================================================
 (platform (win winiov2 wintercept)
   (defalias

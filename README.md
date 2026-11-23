@@ -88,23 +88,12 @@ cd kanata-config-8bitdo
 通过 Kanata 原生 `(platform ...)` 语法，同一份 [8bitdo-retro.kbd](./8bitdo-retro.kbd) 自动按操作系统分流：
 
 - **Windows（直接由 Kanata 处理，无需额外装软件）**：按下即输出快捷键；切换到 `ScrollLock` 透传层时自动恢复原样，游戏不误触。
-- **macOS（Kanata 原样透传 `F13`~`F18` 给 Hammerspoon）**：由 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua) 做按窗口分流的语音输入、后台 Google Meet 静音/举手和桌面切换。
+- **macOS（Kanata 原样透传 `F13`~`F18`）**：由独立仓库 **[yanghu/button-adapter](https://github.com/yanghu/button-adapter)** 里的 Hammerspoon 模块（`hammerspoon/button_adapter.lua`）接管，同时该仓库也包含未来脱离 8BitDo 键盘的独立 3.5mm → USB-C 适配器设计文档。
 
-| 外设 | 硬件键值 | Windows 默认功能（Kanata 内置） | macOS 默认功能（Hammerspoon） |
+| 外设 | 硬件键值 | Windows 默认功能（Kanata 内置） | macOS 默认功能（见 [button-adapter](https://github.com/yanghu/button-adapter)） |
 | :--- | :--- | :--- | :--- |
-| **大按钮 A** | `F17` | **`Ctrl + M`**（Antigravity 语音输入开关） | 按当前窗口分流：<br>• **Antigravity**：轻按 `Ctrl+M` / 长按对讲机<br>• **Claude Code 终端**：按住发 `Space`（`/voice`）<br>• **Claude Desktop**：自动点 UI 麦克风按钮<br>• **其他软件**：触发 **Gemini for Mac** |
-| **大按钮 B** | `F18` | **`Enter`**（语音输完直接拍 B 发送） | **Google Meet 后台控制**：<br>• 轻按 = 静音（`Cmd+D`）<br>• 长按 = 举手（`Ctrl+Cmd+H`） |
-| **摇杆 上 / 下** | `F13` / `F15` | 任务视图（`Win+Tab`） / 显示桌面（`Win+D`） | Mission Control（`Ctrl+↑`） / App Exposé（`Ctrl+↓`） |
-| **摇杆 左 / 右** | `F14` / `F16` | 上/下一个虚拟桌面（`Ctrl+Win+←` / `→`） | 上/下一个虚拟桌面（`Ctrl+←` / `→`） |
-
-### macOS：引入到 `~/.hammerspoon/init.lua`
-
-```lua
-package.path = os.getenv("HOME") .. "/你的路径/kanata-config-8bitdo/hammerspoon/?.lua;" .. package.path
-require("8bitdo_super")
-```
-
-> **提示**：
-> 1. 打开 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua) 顶部的 `CONFIG.geminiFallback`，把 `mods` 和 `key` 改成你在 **Gemini for Mac** 里设的实际热键。
-> 2. 首次在 Chrome 后台触发 Google Meet 时，macOS 会弹窗询问是否允许 Hammerspoon 控制 Chrome，点允许即可。如果希望完全无窗口闪烁，可以在 Chrome 菜单勾选 **显示 → 开发者 → 允许 Apple 事件中的 JavaScript**，然后把 `CONFIG.meetUseAppleEventsJS` 设为 `true`。
+| **大按钮 A** | `F17` | **`Ctrl + M`**（Antigravity 语音输入开关） | 按前台窗口分流（Antigravity / Claude / Gemini for Mac） |
+| **大按钮 B** | `F18` | **`Enter`**（语音输完直接拍 B 发送） | Google Meet 后台控制（轻按静音 / 长按举手） |
+| **摇杆 上 / 下** | `F13` / `F15` | 任务视图（`Win+Tab`） / 显示桌面（`Win+D`） | Mission Control / App Exposé |
+| **摇杆 左 / 右** | `F14` / `F16` | 上/下一个虚拟桌面（`Ctrl+Win+←` / `→`） | 上/下一个虚拟桌面 |
 
