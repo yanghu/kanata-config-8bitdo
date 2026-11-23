@@ -80,3 +80,28 @@ cd kanata-config-8bitdo
 - 仍偶发误触发修饰键 → 增大 `hrm-hold`（当前 `210`）或 `hrm-idle`（当前 `140`）。
 - 觉得长按触发太慢 → 适当减小 `hrm-hold` / `nlt-hold`。
 - 保存文件后，按 **`左 Alt + 右 Shift + R`**（`lrld`）即可热重载，不用重启 Kanata。
+
+---
+
+## macOS Hammerspoon：摇杆 + 两个大按钮（`F13` ~ `F18`）
+
+配合 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua)，把八位堂硬件里映射好的 `F13`~`F18` 变成按窗口分流的语音输入、后台 Google Meet 静音/举手和桌面切换：
+
+| 外设 | 硬件键值 | 默认功能（均可在文件顶部 `CONFIG` 自定义） |
+| :--- | :--- | :--- |
+| **大按钮 A** | `F17` | • **Antigravity**：轻按切换 `Ctrl+M`，按住（≥ 0.35s）松手自动停（对讲机模式）<br>• **Claude Code 终端**：按住发 `Space`（适配 `/voice`）<br>• **Claude Desktop**：自动通过辅助功能点击 UI 麦克风按钮<br>• **其他任意软件**：触发 **Gemini for Mac** 快捷键（请在 `CONFIG.geminiFallback` 填入你的热键） |
+| **大按钮 B** | `F18` | **Google Meet 后台控制**（切去写代码也能用）：<br>• **轻按** = 静音/取消静音（`Cmd+D`）<br>• **长按（≥ 0.35s）** = 举手/放下手（`Ctrl+Cmd+H`） |
+| **摇杆 上 / 下** | `F13` / `F15` | Mission Control（`Ctrl+↑`） / App Exposé（`Ctrl+↓`） |
+| **摇杆 左 / 右** | `F14` / `F16` | 切换上/下一个虚拟桌面（`Ctrl+←` / `Ctrl+→`） |
+
+### 引入到 `~/.hammerspoon/init.lua`
+
+```lua
+package.path = os.getenv("HOME") .. "/你的路径/kanata-config-8bitdo/hammerspoon/?.lua;" .. package.path
+require("8bitdo_super")
+```
+
+> **提示**：
+> 1. 打开 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua) 顶部的 `CONFIG.geminiFallback`，把 `mods` 和 `key` 改成你在 **Gemini for Mac** 里设的实际热键。
+> 2. 首次在 Chrome 后台触发 Google Meet 时，macOS 会弹窗询问是否允许 Hammerspoon 控制 Chrome，点允许即可。如果希望完全无窗口闪烁，可以在 Chrome 菜单勾选 **显示 → 开发者 → 允许 Apple 事件中的 JavaScript**，然后把 `CONFIG.meetUseAppleEventsJS` 设为 `true`。
+
