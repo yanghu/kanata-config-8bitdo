@@ -83,18 +83,21 @@ cd kanata-config-8bitdo
 
 ---
 
-## macOS Hammerspoon：摇杆 + 两个大按钮（`F13` ~ `F18`）
+## 摇杆 + 两个大按钮（`F13` ~ `F18`）跨平台分流
 
-配合 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua)，把八位堂硬件里映射好的 `F13`~`F18` 变成按窗口分流的语音输入、后台 Google Meet 静音/举手和桌面切换：
+通过 Kanata 原生 `(platform ...)` 语法，同一份 [8bitdo-retro.kbd](./8bitdo-retro.kbd) 自动按操作系统分流：
 
-| 外设 | 硬件键值 | 默认功能（均可在文件顶部 `CONFIG` 自定义） |
-| :--- | :--- | :--- |
-| **大按钮 A** | `F17` | • **Antigravity**：轻按切换 `Ctrl+M`，按住（≥ 0.35s）松手自动停（对讲机模式）<br>• **Claude Code 终端**：按住发 `Space`（适配 `/voice`）<br>• **Claude Desktop**：自动通过辅助功能点击 UI 麦克风按钮<br>• **其他任意软件**：触发 **Gemini for Mac** 快捷键（请在 `CONFIG.geminiFallback` 填入你的热键） |
-| **大按钮 B** | `F18` | **Google Meet 后台控制**（切去写代码也能用）：<br>• **轻按** = 静音/取消静音（`Cmd+D`）<br>• **长按（≥ 0.35s）** = 举手/放下手（`Ctrl+Cmd+H`） |
-| **摇杆 上 / 下** | `F13` / `F15` | Mission Control（`Ctrl+↑`） / App Exposé（`Ctrl+↓`） |
-| **摇杆 左 / 右** | `F14` / `F16` | 切换上/下一个虚拟桌面（`Ctrl+←` / `Ctrl+→`） |
+- **Windows（直接由 Kanata 处理，无需额外装软件）**：按下即输出快捷键；切换到 `ScrollLock` 透传层时自动恢复原样，游戏不误触。
+- **macOS（Kanata 原样透传 `F13`~`F18` 给 Hammerspoon）**：由 [hammerspoon/8bitdo_super.lua](./hammerspoon/8bitdo_super.lua) 做按窗口分流的语音输入、后台 Google Meet 静音/举手和桌面切换。
 
-### 引入到 `~/.hammerspoon/init.lua`
+| 外设 | 硬件键值 | Windows 默认功能（Kanata 内置） | macOS 默认功能（Hammerspoon） |
+| :--- | :--- | :--- | :--- |
+| **大按钮 A** | `F17` | **`Ctrl + M`**（Antigravity 语音输入开关） | 按当前窗口分流：<br>• **Antigravity**：轻按 `Ctrl+M` / 长按对讲机<br>• **Claude Code 终端**：按住发 `Space`（`/voice`）<br>• **Claude Desktop**：自动点 UI 麦克风按钮<br>• **其他软件**：触发 **Gemini for Mac** |
+| **大按钮 B** | `F18` | **`Win + H`**（Windows 全局语音听写） | **Google Meet 后台控制**：<br>• 轻按 = 静音（`Cmd+D`）<br>• 长按 = 举手（`Ctrl+Cmd+H`） |
+| **摇杆 上 / 下** | `F13` / `F15` | 任务视图（`Win+Tab`） / 显示桌面（`Win+D`） | Mission Control（`Ctrl+↑`） / App Exposé（`Ctrl+↓`） |
+| **摇杆 左 / 右** | `F14` / `F16` | 上/下一个虚拟桌面（`Ctrl+Win+←` / `→`） | 上/下一个虚拟桌面（`Ctrl+←` / `→`） |
+
+### macOS：引入到 `~/.hammerspoon/init.lua`
 
 ```lua
 package.path = os.getenv("HOME") .. "/你的路径/kanata-config-8bitdo/hammerspoon/?.lua;" .. package.path

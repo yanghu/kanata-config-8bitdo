@@ -27,7 +27,8 @@
   ;; )
 )
 
-;; Main typing block + `grv` (~/`) + bottom row + ScrollLock (passthrough toggle).
+;; Main typing block + `grv` (~/`) + bottom row + ScrollLock (passthrough toggle)
+;; + F13-F18 (8BitDo Super Stick Up/Left/Down/Right & Dual Super Buttons A/B).
 ;; All other TKL keys (Esc, F-row, number row, arrows, PrtSc, Ins/Home/PgUp, etc.)
 ;; remain normal and work natively thanks to `process-unmapped-keys yes`.
 (defsrc
@@ -36,6 +37,7 @@
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
   lctl lmet lalt           spc            ralt rctl      slck
+  f13  f14  f15  f16  f17  f18
 )
 
 ;; Virtual key used so holding LAlt (SYMBOL) + tapping Tab keeps LAlt held
@@ -153,6 +155,38 @@
 )
 
 ;; ============================================================================
+;; Per-OS mappings for 8BitDo Super Stick (F13-F16) & Dual Super Buttons (F17-F18)
+;;   - Windows: handled directly inside Kanata (no extra tool required)
+;;       Button A (F17) -> Ctrl+M  (Antigravity voice input toggle)
+;;       Button B (F18) -> Win+H   (Windows global voice typing)
+;;       Stick Up/Down  -> Win+Tab (Task View) / Win+D (Show Desktop)
+;;       Stick L/R      -> Ctrl+Win+Left / Ctrl+Win+Right (Virtual Desktops)
+;;   - macOS / Linux: pass raw F13-F18 straight through to Hammerspoon
+;;       (see hammerspoon/8bitdo_super.lua for app-aware voice + Google Meet)
+;; ============================================================================
+(platform (win winiov2 wintercept)
+  (defalias
+    s_up   M-tab       ;; F13: Task View (Win+Tab)
+    s_lft  C-M-left    ;; F14: Previous Virtual Desktop (Ctrl+Win+Left)
+    s_dn   M-d         ;; F15: Show / Toggle Desktop (Win+D)
+    s_rgt  C-M-rght    ;; F16: Next Virtual Desktop (Ctrl+Win+Right)
+    btn_a  C-m         ;; F17 (Button A): Antigravity voice toggle (Ctrl+M)
+    btn_b  M-h         ;; F18 (Button B): Windows voice typing (Win+H)
+  )
+)
+
+(platform (macos linux)
+  (defalias
+    s_up   f13
+    s_lft  f14
+    s_dn   f15
+    s_rgt  f16
+    btn_a  f17
+    btn_b  f18
+  )
+)
+
+;; ============================================================================
 ;; Combos (35ms window)
 ;;   M + ,     -> ESC          (DEFAULT layer) / GUI + L (SYMBOL layer)
 ;;   A + S + V -> Ctrl+Shift+V (all active layers)
@@ -171,6 +205,7 @@
 ;;   - lalt    -> hold SYMBOL (and LAlt + Tab -> native Alt+Tab)
 ;;   - ralt    -> normal RAlt (NAV layer shelved for now)
 ;;   - slck    -> toggle Passthrough mode (handy on Windows for Zen / gaming)
+;;   - f13-f18 -> per-OS Super Stick & Dual Super Buttons (Windows shortcuts / macOS Hammerspoon)
 ;; ============================================================================
 (deflayer default
   grv
@@ -178,6 +213,7 @@
   lctl    @a_ctl s      d      @f_num g      h      j      @k_ctl l      ;      '       ret
   lsft    z      x      c      v      b      n      m      ,      .      /      @rsft_s
   lctl    lmet   @sym                 spc                  ralt   rctl          @to_raw
+  @s_up   @s_lft @s_dn  @s_rgt @btn_a @btn_b
 )
 
 ;; ============================================================================
@@ -194,6 +230,7 @@
   _      [      ]      @lbrc  @rbrc  @g_spc @c_crt -      =      @under @colon @dqt  _
   _      @pipe  grv    \      @tilde @c_spc XX     @plus  @lt    @gt    @qmark @fnc
   _      _      _                    0                    _      _             _
+  _      _      _      _      _      _
 )
 
 ;; ============================================================================
@@ -207,6 +244,7 @@
   _    _    _    _    lrld _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _              _              _    _         _
+  _    _    _    _    _    _
 )
 
 ;; ============================================================================
@@ -222,6 +260,7 @@
   @sk_gui @sk_ctl @sk_sft @sk_alt _    _    _       4    5    6    -      @star  kprt
   lsft    lmet    _       _       _    _    _       1    2    3    /      =
   _       _       _                    0                 .    kprt        _
+  _       _       _       _       _    _
 )
 
 ;; ============================================================================
@@ -235,6 +274,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _              _              _    _         @to_def
+  _    _    _    _    _    _
 )
 
 ;; ============================================================================
@@ -245,5 +285,6 @@
 ;;   _    lctl lsft pgdn lctl XX   left down up   rght XX   XX   _
 ;;   XX   XX   XX   mute vold volu XX   XX   XX   XX   XX   _
 ;;   _    _    _              _              _    _         _
+;;   _    _    _    _    _    _
 ;; )
 ;; ============================================================================
