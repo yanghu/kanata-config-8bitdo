@@ -93,7 +93,7 @@ cd kanata-config-8bitdo
 | 外设 | 硬件键值 | Windows 默认功能（Kanata 内置） | macOS 默认功能（Hammerspoon） |
 | :--- | :--- | :--- | :--- |
 | **大按钮 A** | `F17` | **`Ctrl + M`**（Antigravity 语音输入开关） | 按当前窗口分流：<br>• **Antigravity**：轻按 `Ctrl+M` / 长按对讲机<br>• **Claude Code 终端**：按住发 `Space`（`/voice`）<br>• **Claude Desktop**：自动点 UI 麦克风按钮<br>• **其他软件**：触发 **Gemini for Mac** |
-| **大按钮 B** | `F18` | **`Win + H`**（Windows 全局语音听写） | **Google Meet 后台控制**：<br>• 轻按 = 静音（`Cmd+D`）<br>• 长按 = 举手（`Ctrl+Cmd+H`） |
+| **大按钮 B** | `F18` | **`Enter`**（语音输完直接拍 B 发送） | **Google Meet 后台控制**：<br>• 轻按 = 静音（`Cmd+D`）<br>• 长按 = 举手（`Ctrl+Cmd+H`） |
 | **摇杆 上 / 下** | `F13` / `F15` | 任务视图（`Win+Tab`） / 显示桌面（`Win+D`） | Mission Control（`Ctrl+↑`） / App Exposé（`Ctrl+↓`） |
 | **摇杆 左 / 右** | `F14` / `F16` | 上/下一个虚拟桌面（`Ctrl+Win+←` / `→`） | 上/下一个虚拟桌面（`Ctrl+←` / `→`） |
 

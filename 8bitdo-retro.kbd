@@ -158,7 +158,7 @@
 ;; Per-OS mappings for 8BitDo Super Stick (F13-F16) & Dual Super Buttons (F17-F18)
 ;;   - Windows: handled directly inside Kanata (no extra tool required)
 ;;       Button A (F17) -> Ctrl+M  (Antigravity voice input toggle)
-;;       Button B (F18) -> Win+H   (Windows global voice typing)
+;;       Button B (F18) -> Enter   (send right after voice input)
 ;;       Stick Up/Down  -> Win+Tab (Task View) / Win+D (Show Desktop)
 ;;       Stick L/R      -> Ctrl+Win+Left / Ctrl+Win+Right (Virtual Desktops)
 ;;   - macOS / Linux: pass raw F13-F18 straight through to Hammerspoon
@@ -171,7 +171,7 @@
     s_dn   M-d         ;; F15: Show / Toggle Desktop (Win+D)
     s_rgt  C-M-rght    ;; F16: Next Virtual Desktop (Ctrl+Win+Right)
     btn_a  C-m         ;; F17 (Button A): Antigravity voice toggle (Ctrl+M)
-    btn_b  M-h         ;; F18 (Button B): Windows voice typing (Win+H)
+    btn_b  ret         ;; F18 (Button B): Enter (send after voice input)
   )
 )
 
