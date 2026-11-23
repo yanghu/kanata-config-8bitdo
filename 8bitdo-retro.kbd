@@ -1,6 +1,7 @@
 ;; ============================================================================
 ;; Kanata config for 8BitDo Retro Mechanical Keyboard (ANSI TKL)
 ;; Ported from: yanghu/zmk-config-zen-2 (config/corneish_zen.keymap)
+;; Tuned for conservative, low-latency typing on a full TKL keyboard
 ;; Supports: macOS & Windows (Kanata v1.9+ / validated on v1.12.0)
 ;;
 ;; Emergency exit if anything ever gets stuck:
@@ -27,7 +28,7 @@
 )
 
 ;; Main typing block + `grv` (~/`) + bottom row + ScrollLock (passthrough toggle).
-;; All other TKL keys (Esc, F-row, number row, arrows, Ins/Home/PgUp, etc.)
+;; All other TKL keys (Esc, F-row, number row, arrows, PrtSc, Ins/Home/PgUp, etc.)
 ;; remain normal and work natively thanks to `process-unmapped-keys yes`.
 (defsrc
   grv
@@ -45,39 +46,37 @@
 )
 
 (defvar
-  ;; Mirror ZMK timings from corneish_zen.keymap:
-  ;;   lht: tapping-term-ms=180, quick-tap-ms=80,  balanced
-  ;;   rht: tapping-term-ms=200, quick-tap-ms=100, balanced
-  ;;   n_lt: tapping-term-ms=150, quick-tap-ms=90, tap-preferred
-  lht-tap   80
-  lht-hold  180
-  rht-tap   100
-  rht-hold  200
-  nlt-tap   90
-  nlt-hold  150
+  ;; Conservative TKL timings (tap-preferred / require-prior-idle = 140ms):
+  ;;   - A / K (Ctrl): hold 210ms, prior-idle 140ms
+  ;;   - F (NUMPAD):   hold 190ms, prior-idle 140ms
+  ;;   - Combos:       35ms window
+  hrm-tap    100
+  hrm-hold   210
+  hrm-idle   140
 
-  ;; Combo window (ms)
-  chord-time 50
+  nlt-tap    100
+  nlt-hold   190
+  nlt-idle   140
 
-  ;; Keys that force EARLY TAP for left-hand HRMs (`A` / `S`).
-  ;; Matches ZMK `lht` hold-trigger-key-positions (all right hand + W, A, S, C, V
-  ;; are allowed to trigger hold; remaining left-hand keys force tap).
+  chord-time 35
+
+  ;; Keys that force EARLY TAP for left-hand HRM (`A` -> LCtrl).
+  ;; Right-hand keys + W, C, V stay excluded so intentional A-hold + C/V/W still works.
   lht-tap-keys (
     grv tab q e r t
-    caps d f g
+    caps s d f g
     lsft z x b
   )
 
-  ;; Keys that force EARLY TAP for right-hand HRM (`K`).
-  ;; Matches ZMK `rht` hold-trigger-key-positions (all left hand triggers hold;
-  ;; same-hand right keys force tap).
+  ;; Keys that force EARLY TAP for right-hand HRM (`K` -> LCtrl).
+  ;; Same-hand right keys force early tap; left-hand keys allowed after hold timeout.
   rht-tap-keys (
     y u i o p bspc
     h j l ; ' ret
     n m , . / rsft
   )
 
-  ;; Keys that force EARLY TAP for `F` -> NUMPAD (`n_lt`).
+  ;; Keys that force EARLY TAP for `F` -> NUMPAD.
   ;; Right-hand numpad area + Space stay excluded so F + numpad keys work cleanly.
   nlt-tap-keys (
     grv tab q w e r t
@@ -87,20 +86,20 @@
 )
 
 (defalias
-  ;; --- Home Row Mods & F-hold Numpad (bilateral + require-prior-idle) ---
-  a_ctl (tap-hold-release-keys $lht-tap $lht-hold a lctl $lht-tap-keys (require-prior-idle 80))
-  s_sft (tap-hold-release-keys $lht-tap $lht-hold s lsft $lht-tap-keys (require-prior-idle 80))
-  f_num (tap-hold-tap-keys     $nlt-tap $nlt-hold f (layer-while-held numpad) $nlt-tap-keys (require-prior-idle 90))
-  k_ctl (tap-hold-release-keys $rht-tap $rht-hold k lctl $rht-tap-keys (require-prior-idle 100))
+  ;; --- Conservative Home Row Mods (tap-hold-tap-keys = ZMK tap-preferred) ---
+  ;; Only A and K carry LCtrl (S is pure `s` since TKL has dedicated physical Shift).
+  ;; Nested key presses before hold-time NEVER misfire as modifiers.
+  a_ctl (tap-hold-tap-keys $hrm-tap $hrm-hold a lctl $lht-tap-keys (require-prior-idle $hrm-idle))
+  k_ctl (tap-hold-tap-keys $hrm-tap $hrm-hold k lctl $rht-tap-keys (require-prior-idle $hrm-idle))
+  f_num (tap-hold-tap-keys $nlt-tap $nlt-hold f (layer-while-held numpad) $nlt-tap-keys (require-prior-idle $nlt-idle))
 
-  ;; --- Layer triggers ---
+  ;; --- Layer triggers (all typing layers are strictly momentary) ---
   ;; Hold LAlt for SYMBOL; if Tab was pressed to trigger Alt+Tab (`v_alt`),
   ;; releasing LAlt also releases `v_alt`.
   sym   (multi (layer-while-held symbol) (on-release release-vkey v_alt))
   fnc   (layer-while-held func)
-  ret_p (tap-hold-release 150 200 ret (layer-while-held pscr))
 
-  ;; Passthrough toggle (dedicated ScrollLock key only — all typing layers are momentary)
+  ;; Passthrough toggle (dedicated ScrollLock key only)
   to_def (layer-switch default)
   to_raw (layer-switch passthrough)
 
@@ -145,7 +144,6 @@
   g_spc  M-spc   ;; GUI + Space (Spotlight / launcher)
   c_spc  C-spc   ;; Ctrl + Space
   c_crt  C-S-6   ;; Ctrl + ^ (Vim alternate file)
-  s_prt  S-prtsc ;; Shift + PrintScreen
 
   ;; --- Layer-aware M + , combo: M-l on SYMBOL, Esc on DEFAULT ---
   m_cma (switch
@@ -155,19 +153,21 @@
 )
 
 ;; ============================================================================
-;; Combos (ported from ZMK lines 102-105)
+;; Combos (35ms window)
 ;;   M + ,     -> ESC          (DEFAULT layer) / GUI + L (SYMBOL layer)
 ;;   A + S + V -> Ctrl+Shift+V (all active layers)
 ;; ============================================================================
 (defchordsv2
-  (m ,)   @m_cma $chord-time first-release (func numpad pscr passthrough)
+  (m ,)   @m_cma $chord-time first-release (func numpad passthrough)
   (a s v) C-S-v  $chord-time first-release (passthrough)
 )
 
 ;; ============================================================================
-;; Layer 0: DEFAULT (QWERTY + HRMs + F-Numpad)
+;; Layer 0: DEFAULT (QWERTY + Conservative A/K Ctrl + F-Numpad)
 ;;   - grv (`) stays normal backtick/tilde
 ;;   - caps    -> lctl
+;;   - s       -> pure s (no home-row Shift; use physical Shift)
+;;   - ret     -> pure Enter (no PSCR hold-tap; use physical PrtSc)
 ;;   - lalt    -> hold SYMBOL (and LAlt + Tab -> native Alt+Tab)
 ;;   - ralt    -> normal RAlt (NAV layer shelved for now)
 ;;   - slck    -> toggle Passthrough mode (handy on Windows for Zen / gaming)
@@ -175,7 +175,7 @@
 (deflayer default
   grv
   tab     q      w      e      r      t      y      u      i      o      p      @bspc_d
-  lctl    @a_ctl @s_sft d      @f_num g      h      j      @k_ctl l      ;      '       @ret_p
+  lctl    @a_ctl s      d      @f_num g      h      j      @k_ctl l      ;      '       ret
   lsft    z      x      c      v      b      n      m      ,      .      /      @rsft_s
   lctl    lmet   @sym                 spc                  ralt   rctl          @to_raw
 )
@@ -225,19 +225,7 @@
 )
 
 ;; ============================================================================
-;; Layer 4: PSCR (Hold Enter)
-;;   Hold Enter + Backspace -> Shift+PrtSc, Hold Enter + ' -> PrtSc
-;; ============================================================================
-(deflayer pscr
-  XX
-  XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   @s_prt
-  XX   lctl lsft XX   XX   XX   XX   XX   XX   XX   XX   prtsc _
-  lalt XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   _
-  _    _    _              _              _    _         _
-)
-
-;; ============================================================================
-;; Layer 5: PASSTHROUGH (Raw keyboard — zero HRMs, zero combos, zero layers)
+;; Layer 4: PASSTHROUGH (Raw keyboard — zero HRMs, zero combos, zero layers)
 ;; Press ScrollLock (`slck`) again to return to DEFAULT layer.
 ;; Ideal on Windows when switching back to Corneish Zen or playing games.
 ;; ============================================================================

@@ -19,18 +19,18 @@ cd kanata-config-8bitdo
 
 | 功能 | 8BitDo 按键 | 说明 |
 | :--- | :--- | :--- |
-| **Home Row Mods** | 按住 `A` = `LCtrl`、`S` = `LShift`、`K` = `LCtrl` | 异手触发 + `require-prior-idle` 防误触（参数对齐 ZMK `lht`/`rht`） |
-| **NUMPAD 层** | 按住 `F`（仅按住生效） | 右手 `UIO/JKL/M,.` = 7-9/4-6/1-3，空格 = `0`，`RAlt` = `.`，松开即回默认层 |
+| **Home Row Mods（保守版）** | 按住 `A` / `K` = `LCtrl`（`S` 为纯字母） | `tap-hold-tap-keys`（`tap-preferred`），`hold=210ms`、`prior-idle=140ms`，连打零延迟且绝不因嵌套按键误触 |
+| **NUMPAD 层** | 按住 `F`（仅按住生效） | `tap-preferred`，`hold=190ms`、`prior-idle=140ms`；右手 `UIO/JKL/M,.` = 7-9/4-6/1-3，空格 = `0`，`RAlt` = `.` |
 | **SYMBOL 层** | 按住 **`左 Alt`**（仅按住生效） | 与 ZMK `symbol_layer` 一致；按住时 `Space` = `0`，`右 Shift` = `FUNC` 层 |
 | **`~` / `` ` ``（Tab 正上方）** | 默认 = `` ` ``（反引号），`SYMBOL` + `` ` `` = **`~`** | 不再占用 `Tab` 键 |
 | **原生 `Alt + Tab`** | 按住 **`左 Alt`** + 按 **`Tab`** | 通过虚拟键保持 `LAlt` 按住，支持连续按 `Tab` 切换窗口，松开 `左 Alt` 确认 |
 | **CapsLock** | **`CapsLock`** = **`LCtrl`** | 直接映射为左 Control（保留大键盘物理 Shift） |
+| **Enter** | 原生 **`Enter`** | 无长按延迟（截屏直接用大键盘右上角实体 `PrtSc` 键） |
 | **右 Alt / 右 Ctrl** | 保持原生 **`RAlt`** / **`RCtrl`** | `NAV` 层暂时搁置（代码已注释保留在配置底部） |
 | **FUNC 层** | `左 Alt` + `右 Shift` | `Tab..Bspc` = `F1..F12`；`R` = 热重载配置（`lrld`） |
-| **PSCR 截图层** | 按住 `Enter` | + `Backspace` = `Shift+PrtSc`，+ `'` = `PrtSc` |
 | **Sticky Shift** | 轻按 **`右 Shift`**（按住仍为普通 Shift） | 600ms 单次 Shift，对齐 ZMK `&sk LSHIFT` |
 | **Shift + Backspace** | `Shift + Backspace` | 输出 `Delete`（对齐 ZMK `bspc_del`） |
-| **Combos** | `M+,` = `Esc`（SYMBOL 层为 `Win/Cmd+L`）<br>`A+S+V` = `Ctrl+Shift+V` | 50ms 触发窗口 |
+| **Combos** | `M+,` = `Esc`（SYMBOL 层为 `Win/Cmd+L`）<br>`A+S+V` = `Ctrl+Shift+V` | `35ms` 紧凑触发窗口 |
 | **纯透传模式（重要）** | **`ScrollLock`** 键 | 一键关闭所有改键/HRM/Combo；Windows 下切回 Zen Corne 或打游戏时按一下，再按一次恢复 |
 | **紧急退出 Kanata** | **`LCtrl + Space + Esc`** | Kanata 内置保底快捷键，随时强行退出 |
 
@@ -77,6 +77,6 @@ cd kanata-config-8bitdo
 ## 微调手感
 
 打开 [8bitdo-retro.kbd](./8bitdo-retro.kbd) 顶部的 `defvar` 区域即可按手感调整：
-- 误触发修饰键 → 增大 `lht-hold` / `rht-hold`（如从 `180`/`200` 调到 `200`/`220`）或增大 `require-prior-idle`（如 `80` → `120`）。
-- 快捷键反应慢 → 适当减小 `lht-hold` / `rht-hold`。
+- 仍偶发误触发修饰键 → 增大 `hrm-hold`（当前 `210`）或 `hrm-idle`（当前 `140`）。
+- 觉得长按触发太慢 → 适当减小 `hrm-hold` / `nlt-hold`。
 - 保存文件后，按 **`左 Alt + 右 Shift + R`**（`lrld`）即可热重载，不用重启 Kanata。
