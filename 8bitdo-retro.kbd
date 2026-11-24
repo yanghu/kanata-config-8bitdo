@@ -141,8 +141,10 @@
   qmark  S-/     ;; ?
 
   ;; --- Shortcut helpers ---
-  ;; Native-style Alt+Tab when holding LAlt (SYMBOL) and pressing Tab
-  atab   (multi (on-press press-vkey v_alt) tab)
+  ;; Native-style Alt+Tab when holding LAlt (SYMBOL) and pressing Tab.
+  ;; `press-vkey` takes effect on the next tick, so include `lalt` directly in
+  ;; `multi` on the first press so Tab isn't sent before LAlt is down.
+  atab   (fork (multi lalt (on-press press-vkey v_alt) tab) tab (lalt))
   g_spc  M-spc   ;; GUI + Space (Spotlight / launcher)
   c_spc  C-spc   ;; Ctrl + Space
   c_crt  C-S-6   ;; Ctrl + ^ (Vim alternate file)
