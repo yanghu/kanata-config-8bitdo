@@ -27,7 +27,7 @@ cd kanata-config-8bitdo
 | **CapsLock** | **`CapsLock`** = **`LCtrl`** | 直接映射为左 Control（保留大键盘物理 Shift） |
 | **Enter** | 原生 **`Enter`** | 无长按延迟（截屏直接用大键盘右上角实体 `PrtSc` 键） |
 | **右 Alt / 右 Ctrl** | 保持原生 **`RAlt`** / **`RCtrl`** | `NAV` 层暂时搁置（代码已注释保留在配置底部） |
-| **FUNC 层** | `左 Alt` + `右 Shift` | `Tab..Bspc` = `F1..F12`；`R` = 热重载配置（`lrld`） |
+| **FUNC 层** | `左 Alt` + `右 Shift` | `Tab..Bspc` = `F1..F12`；`F` = 热重载配置（`lrld`） |
 | **Sticky Shift** | 轻按 **`右 Shift`**（按住仍为普通 Shift） | 600ms 单次 Shift，对齐 ZMK `&sk LSHIFT` |
 | **Shift + Backspace** | `Shift + Backspace` | 输出 `Delete`（对齐 ZMK `bspc_del`） |
 | **Combos** | `M+,` = `Esc`（SYMBOL 层为 `Win/Cmd+L`）<br>`A+S+V` = `Ctrl+Shift+V` | `35ms` 紧凑触发窗口 |
@@ -79,7 +79,7 @@ cd kanata-config-8bitdo
 打开 [8bitdo-retro.kbd](./8bitdo-retro.kbd) 顶部的 `defvar` 区域即可按手感调整：
 - 仍偶发误触发修饰键 → 增大 `hrm-hold`（当前 `210`）或 `hrm-idle`（当前 `140`）。
 - 觉得长按触发太慢 → 适当减小 `hrm-hold` / `nlt-hold`。
-- 保存文件后，按 **`左 Alt + 右 Shift + R`**（`lrld`）即可热重载，不用重启 Kanata。
+- 保存文件后，按 **`左 Alt + 右 Shift + F`**（`lrld`）即可热重载，不用重启 Kanata。
 
 ---
 
